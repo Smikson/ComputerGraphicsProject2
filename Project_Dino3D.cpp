@@ -23,6 +23,11 @@ struct Point {
 	double z;
 };
 
+struct PointList {
+	Point pts[50];
+	int size;
+};
+
 // Set up a point as a copy of another point
 //<<<<<<<<<<<<<<<<<<<<<<< copy >>>>>>>>>>>>>>>>>>>>
 void copy(Point &dest, Point ori) {
@@ -245,18 +250,94 @@ void moveCam(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
+// Draws a rectangular prism with lines (assumes stored as first 'n' make the "base", next 'n' make the "top")
+//<<<<<<<<<<<<<<<<<<<<<<<< drawPrismLines >>>>>>>>>>>>>>>>>
+void drawPrismLines(PointList prism, int n) {
+	// Draw the "base" plane
+	glBegin(GL_LINES);
+	for (int i = 0; i < n; i++) {
+		glVertex3f(prism.pts[i].x, prism.pts[i].y, prism.pts[i].z);
+		glVertex3f(prism.pts[(i+1)%n].x, prism.pts[(i+1)%n].y, prism.pts[(i+1)%n].z);
+	}
+	
+	// Draw the "top" plane
+	for (int i = n; i < 2*n; i++) {
+		glVertex3f(prism.pts[i].x, prism.pts[i].y, prism.pts[i].z);
+		glVertex3f(prism.pts[(i+1)%n + n].x, prism.pts[(i+1)%n + n].y, prism.pts[(i+1)%n + n].z);
+	}
+	
+	// Draw each line between the top and the bottom: the side "walls"
+	for (int i = 0; i < n; i++) {
+		glVertex3f(prism.pts[i].x, prism.pts[i].y, prism.pts[i].z);
+		glVertex3f(prism.pts[i+n].x, prism.pts[i+n].y, prism.pts[i+n].z);
+	}
+	glEnd();
+}
+
+// Draws a filled rectangular prism (assumes stored as first 'n' make the "base", next 'n' make the "top")
+//<<<<<<<<<<<<<<<<<<<<<<<< drawPrismSolid >>>>>>>>>>>>>>>>>
+void drawPrismSolid(PointList prism, int n) {
+	// Draw the "base" plane
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < n; i++) {
+		glVertex3f(prism.pts[i].x, prism.pts[i].y, prism.pts[i].z);
+	}
+	glEnd();
+	
+	// Draw the "top" plane
+	glBegin(GL_POLYGON);
+	for (int i = n; i < 2*n; i++) {
+		glVertex3f(prism.pts[i].x, prism.pts[i].y, prism.pts[i].z);
+	}
+	glEnd();
+	
+	// Draw each plane between all the points: the side "walls"
+	for (int i = 0; i < n; i++) {
+		glBegin(GL_POLYGON);
+		
+		// Draw the plane look at the same points from each half of the stored prism
+		glVertex3f(prism.pts[i].x, prism.pts[i].y, prism.pts[i].z);
+		glVertex3f(prism.pts[(i + 1) % n].x, prism.pts[(i + 1) % n].y, prism.pts[(i + 1) % n].z);
+		glVertex3f(prism.pts[((i + 1) % n) + n].x, prism.pts[((i + 1) % n) + n].y, prism.pts[((i + 1) % n) + n].z);
+		glVertex3f(prism.pts[i+n].x, prism.pts[i+n].y, prism.pts[i+n].z);
+		
+		glEnd();
+	}
+}
+
 // Draws the dodecahedron
 //<<<<<<<<<<<<<<<<<<<<<<<< draw >>>>>>>>>>>>>>>>>
 void draw(void) {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	// Draw Dodecahedron
+	// Draw Dodecahedron -- Change this to a dinosour!
 	glColor3f(0.0f, 1.0f, 0.0f);
-	glutSolidDodecahedron();
+	//glutSolidDodecahedron();
 	glColor3f(0.0f, 0.0f, 0.0f);
-	glutWireDodecahedron();
+	//glutWireDodecahedron();
 	
+	// Create a test rectangular prism
+	double xs[] = {1,2,2,1,1,2,2,1};
+	double ys[] = {1,1,2,2,1,1,2,2};
+	double zs[] = {.5,.5,.5,.5,2.5,2.5,2.5,2.5};
+	
+	PointList test;
+	test.size = 8;
+	for (int i = 0; i < 8; i++) {
+		Point p;
+		p.x = xs[i];
+		p.y = ys[i];
+		p.z = zs[i];
+		
+		test.pts[i] = p;
+	}
+	
+	
+	glColor3f(0.0f, 1.0f, 0.0f);
+	drawPrismSolid(test, 4);
+	glColor3f(0.0f, 0.0f, 0.0f);
+	drawPrismLines(test, 4);
 	
 	// Send all output to display
 	glFlush();
@@ -272,7 +353,7 @@ int main(int argc, char **argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); // set the display mode
 	glutInitWindowSize(640,480);     // set the window size
 	glutInitWindowPosition(100, 150); // set the window position on the screen
-	glutCreateWindow("Roll yourself a d12"); // open the screen window(with its exciting title)
+	glutCreateWindow("Move the camera and dino around the scene!"); // open the screen window(with its exciting title)
 	glutSpecialFunc(arrows);
 	glutKeyboardFunc(moveCam);
 	glutDisplayFunc(draw);     // register the redraw function

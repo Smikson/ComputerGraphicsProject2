@@ -219,6 +219,17 @@ void Camera::yaw(double angle) {
 
 // Create a global camera object to be used by the program
 Camera cam;
+PointList test;
+
+void something(int a)
+{
+	for (int i = 0; i < 8; i++) {
+		if (a==1)
+			test.pts[i].x += 0.2;
+		else
+			test.pts[i].x -= 0.2;
+	}
+}
 
 // Arrows function to interactively move camera
 //<<<<<<<<<<<<<<<<<<<<<<<< arrows >>>>>>>>>>>>>>>>>
@@ -245,6 +256,8 @@ void moveCam(unsigned char key, int x, int y) {
 		case 'd': cam.pitch(-1.0); break;
 		case 'a': cam.yaw(1.0); break;
 		case 's': cam.yaw(-1.0); break;
+		case 't': something(1); break;
+		case 'T'-64: something(0); break;
 	}
 	
 	glutPostRedisplay();
@@ -319,20 +332,6 @@ void draw(void) {
 	//glutWireDodecahedron();
 	
 	// Create a test rectangular prism
-	double xs[] = {1,2,2,1,1,2,2,1};
-	double ys[] = {1,1,2,2,1,1,2,2};
-	double zs[] = {.5,.5,.5,.5,2.5,2.5,2.5,2.5};
-	
-	PointList test;
-	test.size = 8;
-	for (int i = 0; i < 8; i++) {
-		Point p;
-		p.x = xs[i];
-		p.y = ys[i];
-		p.z = zs[i];
-		
-		test.pts[i] = p;
-	}
 	
 	
 	glColor3f(0.0f, 1.0f, 0.0f);
@@ -359,6 +358,23 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(moveCam);
 	glutDisplayFunc(draw);     // register the redraw function
 	glViewport(0,0,640,480);
+
+
+	double xs[] = {1,2,2,1,1,2,2,1};
+	double ys[] = {1,1,2,2,1,1,2,2};
+	double zs[] = {.5,.5,.5,.5,2.5,2.5,2.5,2.5};
+	
+	test.size = 8;
+	for (int i = 0; i < 8; i++) {
+		Point p;
+		p.x = xs[i];
+		p.y = ys[i];
+		p.z = zs[i];
+		
+		test.pts[i] = p;
+	}
+
+
 	Point eye, look, up;
 	eye.x = 4; eye.y = 4; eye.z = 4;
 	look.x = 0; look.y = 0; look.z = 0;

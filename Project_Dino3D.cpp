@@ -309,7 +309,8 @@ void drawPrismSolid(PointList prism, int n) {
 //<<<<<<<<<<<<<<<<<<<<<<<< draw >>>>>>>>>>>>>>>>>
 void draw(void) {
 	// Clear the screen
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	
 	// Draw Dodecahedron -- Change this to a dinosour!
 	glColor3f(0.0f, 1.0f, 0.0f);
@@ -350,7 +351,7 @@ void draw(void) {
 //<<<<<<<<<<<<<<<<<<<<<<<< main >>>>>>>>>>>>>>>>>>>>>>
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);          // initialize the toolkit
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); // set the display mode
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGB); // set the display mode
 	glutInitWindowSize(640,480);     // set the window size
 	glutInitWindowPosition(100, 150); // set the window position on the screen
 	glutCreateWindow("Move the camera and dino around the scene!"); // open the screen window(with its exciting title)
